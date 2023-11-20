@@ -1,24 +1,50 @@
-import logo from './logo.svg';
 import './App.css';
+import Layout from './components/Layout/Layout';
+
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+
+import Recipes from './pages/Recipes';
+import HomePage from './pages/HomePage';
+import ErrorPage from './pages/Error';
+import RecipeDetailsPage from './components/Recipe/RecipeDetails';
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Layout />,
+    errorElement: <ErrorPage />,
+    children: [
+      { index: true, element: <HomePage /> },
+      {
+        path: 'recipes',
+        element: <Recipes />,
+        loader: async () => {
+          const response = await fetch('http://localhost:5000/api/v1/recipe');
+
+          if (!response.ok) {
+            //ERROR
+          } else {
+            const data = await response.json();
+
+            return data.data.recipes;
+          }
+        },
+      },
+      { path: 'recipes/:id', element: <RecipeDetailsPage /> },
+    ],
+  },
+]);
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <RouterProvider router={router} />
+    // <Layout>
+
+    //   {/* <button onClick={toggleRecipes}>Show them thangs!</button>
+    //   <div> Suck it bebbey!</div>
+    //   <div> Open the box you pussy!</div>
+    //   {showRecipes && <RecipeList />} */}
+    // </Layout>
   );
 }
 
